@@ -19,19 +19,29 @@ let addTitles = async (i) => {
     return await resTwo.json(); 
 }
 
+const main = () => {
+    
 results.then((res) =>  {
     res.sources.map(function (obj) {
         sourceArray.push(obj.id);        
-    });
-    console.log(sourceArray);   
+    });  
 
 
     sourceArray.forEach(function(item, i) {
         addTitles(i).then((resTwo) => {
-            let articlesObj = resTwo.articles;
-            titleArray.push(item, articlesObj);    
-            console.log(titleArray);
+            if (resTwo.articles !== undefined) {
+            let articleDetails = resTwo.articles[i];
+            titleArray.push(item, articleDetails);
+            console.log(item, articleDetails);
+            }
+            else {
+            console.log(resTwo[i]);
+            }
         });  
-    });   
+    });
 });
 
+    
+}
+
+main();
