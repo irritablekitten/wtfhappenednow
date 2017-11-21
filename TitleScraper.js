@@ -15,7 +15,7 @@ let results = scrape();
 let addTitles = async (i) => {
     const token = keys.key;
     let resTwo = await fetch(
-        `https://newsapi.org/v1/articles?source=${sourceArray[i]}&apiKey=${token}`)
+        `https://newsapi.org/v2/top-headlines?sources=${sourceArray[i]}&apiKey=${token}`)
     return await resTwo.json(); 
 }
 
@@ -28,15 +28,10 @@ results.then((res) =>  {
 
 
     sourceArray.forEach(function(item, i) {
-        addTitles(i).then((resTwo) => {
-            if (resTwo.articles !== undefined) {
-            let articleDetails = resTwo.articles[i];
+        addTitles(i).then((resTwo) => {      
+            let articleDetails = resTwo.articles[i].title;
             titleArray.push(item, articleDetails);
-            console.log(item, articleDetails);
-            }
-            else {
-            console.log(resTwo[i]);
-            }
+            console.log(item, articleDetails);        
         });  
     });
 });
