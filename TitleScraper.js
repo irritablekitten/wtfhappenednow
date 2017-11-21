@@ -12,10 +12,10 @@ let scrape = async () => {
 
 let results = scrape();
 
-let addTitles = async (i) => {
+let addTitles = async (obj) => {
     const token = keys.key;
     let resTwo = await fetch(
-        `https://newsapi.org/v2/top-headlines?sources=${sourceArray[i]}&apiKey=${token}`)
+        `https://newsapi.org/v2/top-headlines?sources=${obj}&apiKey=${token}`)
     return await resTwo.json(); 
 }
 
@@ -23,20 +23,18 @@ const main = () => {
     
 results.then((res) =>  {
     res.sources.map(function (obj) {
-        sourceArray.push(obj.id);        
+        sourceArray.push(obj);    
     });  
-
-
-    sourceArray.forEach(function(item, i) {
-        addTitles(i).then((resTwo) => {      
-            let articleDetails = resTwo.articles[i].title;
-            titleArray.push(item, articleDetails);
-            console.log(item, articleDetails);        
+    sourceArray.map(function (obj) {
+        addTitles(obj.id).then((resTwo) => {   
+            resTwo.articles.map(function (objTwo) {
+                titleArray.push(obj.id, objTwo.title);
+            }); 
         });  
     });
 });
-
-    
 }
 
-main();
+module.exports.data = main();
+module.exports.sourceArray = sourceArray;
+module.exports.titleArray = titleArray;
