@@ -1,0 +1,5 @@
+The purpose of this program is to use the newsapi.org source API to grab and use each source ID to fetch top articles through the same API. Once the top articles are obtained, a Damerau-Levenshtein (https://www.npmjs.com/package/damerau-levenshtein) algorithm is used to find similar article titles, which for each title with a similarity rating of .40+, the article title is split and stored for finding the most common topics being reported.
+
+The long-term goal is to present the most common words/topics in a live trend feed, where the most-found topics appear at the top with the largest font size and conversely, the least-repetitious words are toward the bottom in smaller font.
+
+Following the outlined functionality, the plan is to use the same data to present links to articles from the source titles that end up as the count for trending news topics, as an interactive trend tracker combined with news sourcing.

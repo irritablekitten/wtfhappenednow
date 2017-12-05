@@ -9,6 +9,7 @@
   "author": "Sam Defazio",
   "license": "ISC",
   "dependencies": {
+    "damerau-levenshtein": "^1.0.4",
     "es6-promise": "^4.1.1",
     "isomorphic-fetch": "^2.2.1"
   },
@@ -16,5 +17,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1"
   },
-  "presets": ["env"]
+  "presets": [
+    "env"
+  ]
 }
