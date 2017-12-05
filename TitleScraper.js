@@ -1,5 +1,5 @@
 const isomorphicFetch = require('isomorphic-fetch');
-const keys = require('./keys.js');
+const keys = require('./keys/keys.js');
 let sourceArray = [];
 let titleArray = [];
 
