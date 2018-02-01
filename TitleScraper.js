@@ -21,7 +21,9 @@ let addTitles = async (obj) => {
 const main = () => {
     scrape().then((res) =>  {
         res.sources.map(function (obj) {
-            sourceArray.push(obj);    
+            if (obj != undefined) {
+                sourceArray.push(obj);
+            }         
         });  
         sourceArray.map(function (obj) {
             addTitles(obj.id).then((resTwo) => {   
@@ -31,7 +33,9 @@ const main = () => {
                         title: objTwo.title,
                         url: objTwo.url
                     };
-                    titleArray.push(article);
+                    if (article != undefined) {
+                        titleArray.push(article);
+                    }
                 }); 
             });  
         });

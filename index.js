@@ -2,11 +2,8 @@ const getData = require('./TitleScraper.js');
 const damerau = require('damerau-levenshtein');
 const express = require('express');
 const app = express();
-
-let filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on'];
+const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
 let compareArray = [];
-let splitArray = [];
-let sortable = [];
 
 //https://stackoverflow.com/questions/17313268/idiomatically-find-the-number-of-occurrences-a-given-value-has-in-an-array
 class Counter extends Map {
@@ -27,6 +24,7 @@ class Counter extends Map {
 //finds matches between titles by comparing one title in titleArray from the compareFunction loop to every title within the same array, while logging high-scoring results and ignoring exact matches
 const levenshteinFunction = (i) => {
     let titleArrayCopy = getData.titleArray;
+    let newArray = [];
     titleArrayCopy.map(function (obj) {
         let test = damerau(obj.title, i.title);
 
@@ -38,9 +36,8 @@ const levenshteinFunction = (i) => {
         
         if (comparison.score > 0.4 && comparison.score < 1 && comparison.first !== '' && comparison.second !== '') {
             compareArray.push(comparison);
-            console.log(comparison);
         } 
-    });         
+    });       
 }
 
 //provides the top level loop for finding matches in titleArray with the damerau-levenshtein algorith
@@ -52,12 +49,14 @@ const compareFunction = () => {
 }
 
 //takes results pushed to compareArray and splits each title into individual words to find commonality
-const splitFunction = () => {
-    let compareArrayCopy = compareArray;
-    compareArrayCopy.map(function (obj) {
+const splitFunction = (splitThis) => {
+    let copy = splitThis;
+    let newArray = []
+    copy.map(function (obj) {
          let post = obj.first.split(' ');
-        splitArray.push(post);
+        newArray.push(post);
      });
+     return newArray;
 }
 
 //returns a new array with old arrays split apart
@@ -84,14 +83,14 @@ const arrayFilter = (results) => {
 
 
 const main = () => {
-    setTimeout(function(comparison) {
-        compareFunction();       
-        splitFunction();
+    setTimeout(function() {
+        compareFunction();
+        let splitArray = splitFunction(compareArray);
         let results = arrayFixer(splitArray);
         let countArray = arrayFilter(results);     
         let counter = new Counter(countArray);
         delete counter.key;
-        sortable = Array.from(counter);
+        let sortable = Array.from(counter);
         sortable.sort(function(a, b) {
             return b[1] - a[1];
         });
@@ -101,7 +100,7 @@ const main = () => {
 
 app.get('/', (req, res) => res.send(sortable))
 
-app.listen(5000, () => console.log('Example app listening on port 3000!'))
+app.listen(5000, () => console.log('Example app listening on port 5000!'))
 
 main();
 
