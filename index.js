@@ -164,6 +164,7 @@ app.get('/wordcount', function (req, res) {
     res.json(sortable)
 });
 
-app.listen(3000, () => console.log('It\'s on.'));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT);
 
 main();
