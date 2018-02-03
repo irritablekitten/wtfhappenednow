@@ -126,10 +126,9 @@ const arrayFilter = (results) => {
     return results; 
 }
 
-
 const main = () => {
-    TitleScraper().then( () => {
-        setTimeout(function() { 
+    TitleScraper();
+    setTimeout(function() { 
             compareFunction();
             let splitArray = splitFunction(compareArray);
             let results = arrayFixer(splitArray);
@@ -149,8 +148,8 @@ const main = () => {
                 return b[1] - a[1];
             });
             console.log(sortSources);
-        }, 5000);    
-    });  
+        }, 10000);    
+   
 }
 
 app.use(cors());
