@@ -26,7 +26,7 @@ let addTitles = async (obj) => {
     return await resTwo.json(); 
 }
 
-const TitleScraper = async () => {
+const TitleScraper = () => {
     scrape().then((res) =>  {
         res.sources.map(function (obj) {             
             sourceArray.push(obj);                      
