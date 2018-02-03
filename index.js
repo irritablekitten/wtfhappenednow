@@ -2,7 +2,7 @@ const damerau = require('damerau-levenshtein');
 const isomorphicFetch = require('isomorphic-fetch');
 const express = require('express');
 const keys = require('./keys/keys.js');
-//const cors = require('cors');
+const cors = require('cors');
 const app = express();
 const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
 let sourceArray = [];
@@ -15,7 +15,7 @@ let countSources = [];
 let scrape = async () => {
     const res = await fetch(
       `https://newsapi.org/v1/sources?language=en`);
-    return await res.json();
+    return await res.json();  
   }
 
 //obtains top articles per source id
@@ -28,28 +28,25 @@ let addTitles = async (obj) => {
 
 const TitleScraper = async () => {
     scrape().then((res) =>  {
-        if (res.sources != undefined) {
-            res.sources.map(function (obj) {             
-                sourceArray.push(obj);                      
-            });  
-        }
+        res.sources.map(function (obj) {             
+            sourceArray.push(obj);                      
+        });    
+        
         sourceArray.map(function (obj) {
-            if (obj != undefined) {
-                addTitles(obj.id).then((resTwo) => {   
-                    resTwo.articles.map(function (objTwo) {
-                        let article = {
-                            id: obj.id,
-                            title: objTwo.title,
-                            url: objTwo.url
-                        };
-                        if (article != undefined) {
-                            titleArray.push(article);
-                        }
-                    }); 
+            addTitles(obj.id).then((resTwo) => {   
+                resTwo.articles.map(function (objTwo) {
+                    let article = {
+                        id: obj.id,
+                        title: objTwo.title,
+                        url: objTwo.url
+                    };
+                    if (article != undefined) {
+                        titleArray.push(article);
+                    }
                 }); 
-            } 
+            }).catch(err => console.error(err)) 
         });
-    });
+    }).catch(err => console.error(err))
 }
 
 //https://stackoverflow.com/questions/17313268/idiomatically-find-the-number-of-occurrences-a-given-value-has-in-an-array
@@ -156,12 +153,12 @@ const main = () => {
     });  
 }
 
-//app.use(cors());
+app.use(cors());
 
 //app.get('/req/wordcount', (req, res) => res.send(JSON.stringify(sortable)));
 
-app.get('/wordcount', function (req, res) {
-    res.json(sortable)
+app.get('/wordcount', function (req, res, next) {
+    res.send(JSON.stringify(sortable));
 });
 
 const PORT = process.env.PORT || 5000;
