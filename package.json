@@ -4,11 +4,12 @@
   "description": "Uses NewsApi sources to pull up top news articles and display a word cloud",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "author": "Sam Defazio",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.4",
     "damerau-levenshtein": "^1.0.4",
     "es6-promise": "^4.1.1",
     "express": "^4.16.2",

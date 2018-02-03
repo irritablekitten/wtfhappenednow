@@ -1,22 +1,36 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as actions from './actions';
 import logo from './logo.svg';
+import Header from './components/Header';
 import './App.css';
+import { FETCH_ARTICLES } from './actions/types';
+
+const Landing = () => <h2>DATA BLARGH</h2>;
 
 class App extends Component {
+  componentDidMount() {
+    this.props.fetchArticles();
+    console.log(FETCH_ARTICLES);
+   
+  }
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+        <BrowserRouter>
+            <div>
+            <header className="App-header">
+              <h1>WTF Happened Now?</h1>
+              <h2>Top news trends every hour, on the hour. Is it F5 O'clock?</h2>
+            </header>
+            <Route exact={true} path="/" component={Landing} />
+            </div>
+          </BrowserRouter>
+        </div>
     );
   }
 }
 
-export default App;
+export default connect(null, actions)(App);
