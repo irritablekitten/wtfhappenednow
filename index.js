@@ -29,9 +29,11 @@ let addTitles = async (obj) => {
 
 const TitleScraper = () => {
     scrape().then((res) =>  {
-        res.sources.map(function (obj) {             
-            sourceArray.push(obj);                      
-        });    
+        if (res.sources !== undefined) {
+            res.sources.map(function (obj) {             
+                sourceArray.push(obj);                      
+            });    
+        }
         
         sourceArray.map(function (obj) {
             addTitles(obj.id).then((resTwo) => {   
@@ -41,7 +43,7 @@ const TitleScraper = () => {
                         title: objTwo.title,
                         url: objTwo.url
                     };
-                    if (article != undefined) {
+                    if (article !== undefined) {
                         titleArray.push(article);
                     }
                 }); 
@@ -128,11 +130,12 @@ const arrayFilter = (results) => {
 }
 
 const main = () => {
-    let runScrape = schedule.scheduleJob('55 * * * *', function(){
+    //scheduled to pull sources and top articles from each source at the 56 minute mark every hour
+    let runScrape = schedule.scheduleJob('56 * * * *', function(){
         TitleScraper();
       });
-    
-      let everythingElse = schedule.scheduleJob('58 * * * *', function(){
+    //scheduled to process data at 59 minutes of every hour
+      let everythingElse = schedule.scheduleJob('59 * * * *', function(){
         compareFunction();
             let splitArray = splitFunction(compareArray);
             let results = arrayFixer(splitArray);
@@ -156,9 +159,6 @@ const main = () => {
 }
 
 app.use(cors());
-
-//app.get('/req/wordcount', (req, res) => res.send(JSON.stringify(sortable)));
-
 app.get('/wordcount', function (req, res, next) {
     res.send(JSON.stringify(sortable));
 });
