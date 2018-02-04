@@ -1,11 +1,11 @@
 {
   "name": "news-api",
   "version": "1.0.0",
-  "description": "Uses NewsApi sources to pull up top news articles and display a word cloud",
+  "description": "Uses NewsApi sources to pull up top news articles and display most common words",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "author": "Sam Defazio",
   "license": "ISC",

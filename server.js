@@ -3,6 +3,7 @@ const isomorphicFetch = require('isomorphic-fetch');
 const express = require('express');
 const keys = require('./keys/keys.js');
 const cors = require('cors');
+//require('es6-promise/auto');
 const schedule = require('node-schedule');
 const app = express();
 const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
