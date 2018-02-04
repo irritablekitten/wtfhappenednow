@@ -3,6 +3,7 @@ const isomorphicFetch = require('isomorphic-fetch');
 const express = require('express');
 const keys = require('./keys/keys.js');
 const cors = require('cors');
+const schedule = require('node-schedule');
 const app = express();
 const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
 let sourceArray = [];
@@ -127,9 +128,12 @@ const arrayFilter = (results) => {
 }
 
 const main = () => {
-    TitleScraper();
-    setTimeout(function() { 
-            compareFunction();
+    let runScrape = schedule.scheduleJob('55 * * * *', function(){
+        TitleScraper();
+      });
+    
+      let everythingElse = schedule.scheduleJob('58 * * * *', function(){
+        compareFunction();
             let splitArray = splitFunction(compareArray);
             let results = arrayFixer(splitArray);
             let countArray = arrayFilter(results);     
@@ -148,8 +152,7 @@ const main = () => {
                 return b[1] - a[1];
             });
             console.log(sortSources);
-        }, 10000);    
-   
+      });
 }
 
 app.use(cors());
