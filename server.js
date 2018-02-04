@@ -37,17 +37,17 @@ const TitleScraper = () => {
         }
         
         sourceArray.map(function (obj) {
-            addTitles(obj.id).then((resTwo) => {   
-                resTwo.articles.map(function (objTwo) {
-                    let article = {
-                        id: obj.id,
-                        title: objTwo.title,
-                        url: objTwo.url
-                    };
-                    if (article !== undefined) {
+            addTitles(obj.id).then((resTwo) => {
+                if (resTwo.articles !== undefined) {
+                    resTwo.articles.map(function (objTwo) {
+                        let article = {
+                            id: obj.id,
+                            title: objTwo.title,
+                            url: objTwo.url
+                        };
                         titleArray.push(article);
-                    }
-                }); 
+                    }); 
+                } 
             }).catch(err => console.error(err)) 
         });
     }).catch(err => console.error(err))
@@ -113,11 +113,8 @@ const arrayFixer = (array) => {
     let newArray = [];
     for (var i in array) {
         for (var j in array[i]) {
-            if (array[i][j] == undefined) {
-                console.log('here is one ' + array[i][j]);
-            }
-            else {
-                newArray.push(array[i][j].toString().toLowerCase());    
+            if (array[i][j] !== undefined) {
+                newArray.push(array[i][j].toString().toLowerCase());
             }                    
         }        
     }
