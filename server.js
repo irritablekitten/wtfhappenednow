@@ -15,8 +15,9 @@ let countSources = [];
 
 //gets all news sources by id
 let scrape = async () => {
-    const res = await fetch(
+    let res = await fetch(
       `https://newsapi.org/v1/sources?language=en`);
+    console.log(res);
     return await res.json();  
   }
 
@@ -25,6 +26,7 @@ let addTitles = async (obj) => {
     const token = keys.key;
     let resTwo = await fetch(
         `https://newsapi.org/v2/top-headlines?sources=${obj}&apiKey=${token}`)
+    console.log(resTwo);
     return await resTwo.json(); 
 }
 
@@ -32,7 +34,8 @@ const TitleScraper = () => {
     scrape().then((res) =>  {
         if (res.sources !== undefined) {
             res.sources.map(function (obj) {             
-                sourceArray.push(obj);                      
+                sourceArray.push(obj);
+                console.log(obj);                      
             });    
         }
         
@@ -46,6 +49,7 @@ const TitleScraper = () => {
                             url: objTwo.url
                         };
                         titleArray.push(article);
+                        console.log(article);
                     }); 
                 } 
             }).catch(err => console.error(err)) 
