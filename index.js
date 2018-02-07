@@ -1,23 +1,36 @@
 const damerau = require('damerau-levenshtein');
 const isomorphicFetch = require('isomorphic-fetch');
 const express = require('express');
-const keys = require('./keys/keys.js');
-const cors = require('cors');
-//require('es6-promise/auto');
+const mongoose = require('mongoose');
+const keys = require('./keys/keys');
 const schedule = require('node-schedule');
+const admin = require("firebase-admin");
+const serviceAccount = require("./keys/wtfhappenednow-server-firebase-adminsdk-q74se-ae52909ff9.json");
 const app = express();
 const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
 let sourceArray = [];
 let titleArray = [];
 let compareArray = [];
-let sortable = [];
+let sortWords = [];
 let countSources = [];
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://wtfhappenednow-server.firebaseio.com"
+});
+
+var db = admin.database();
+var ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
+ref.once("value", function(snapshot) {
+  console.log(snapshot.val());
+}, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+});
 
 //gets all news sources by id
 let scrape = async () => {
     let res = await fetch(
       `https://newsapi.org/v1/sources?language=en`);
-    console.log(res);
     return await res.json();  
   }
 
@@ -26,7 +39,6 @@ let addTitles = async (obj) => {
     const token = keys.key;
     let resTwo = await fetch(
         `https://newsapi.org/v2/top-headlines?sources=${obj}&apiKey=${token}`)
-    console.log(resTwo);
     return await resTwo.json(); 
 }
 
@@ -34,8 +46,7 @@ const TitleScraper = () => {
     scrape().then((res) =>  {
         if (res.sources !== undefined) {
             res.sources.map(function (obj) {             
-                sourceArray.push(obj);
-                console.log(obj);                      
+                sourceArray.push(obj);                 
             });    
         }
         
@@ -49,7 +60,6 @@ const TitleScraper = () => {
                             url: objTwo.url
                         };
                         titleArray.push(article);
-                        console.log(article);
                     }); 
                 } 
             }).catch(err => console.error(err)) 
@@ -115,8 +125,8 @@ const splitFunction = (splitThis) => {
 //returns a new array with old arrays split apart
 const arrayFixer = (array) => {
     let newArray = [];
-    for (var i in array) {
-        for (var j in array[i]) {
+    for (let i in array) {
+        for (let j in array[i]) {
             if (array[i][j] !== undefined) {
                 newArray.push(array[i][j].toString().toLowerCase());
             }                    
@@ -131,24 +141,39 @@ const arrayFilter = (results) => {
     return results; 
 }
 
+const sendToDB = (wordscounted, sourcescounted) => {
+    let postsRef = ref.child("results");
+    postsRef.push({
+        wordcount: wordscounted,
+        sourcecount: sourcescounted,
+        date: admin.database.ServerValue.TIMESTAMP
+      });
+}
+
+const getFromDB = () => {
+    ref.orderByChild('date').on('child_added', function(snapshot) {
+        console.log(snapshot.val());
+    });
+};
+
 const main = () => {
-    //scheduled to pull sources and top articles from each source at the 56 minute mark every hour
-    let runScrape = schedule.scheduleJob('56 * * * *', function(){
+    //scheduled to pull sources and top articles from each source at the 58 minute mark every hour or 53 for pi3
+    let runScrape = schedule.scheduleJob('53 * * * *', function(){
         TitleScraper();
       });
-    //scheduled to process data at 59 minutes of every hour
-      let everythingElse = schedule.scheduleJob('59 * * * *', function(){
+    //scheduled to process data at 59 minutes of every hour or 54 for pi3
+      let everythingElse = schedule.scheduleJob('54 * * * *', function(){
         compareFunction();
             let splitArray = splitFunction(compareArray);
             let results = arrayFixer(splitArray);
             let countArray = arrayFilter(results);     
             let counter = new Counter(countArray);
             delete counter.key;
-            sortable = Array.from(counter);
-            sortable.sort(function(a, b) {
+            sortWords = Array.from(counter);
+            sortWords.sort(function(a, b) {
                 return b[1] - a[1];
             });
-            console.log(sortable);
+            console.log(sortWords);
             
             let printSources = new Counter(countSources);
             delete printSources.key;
@@ -157,12 +182,12 @@ const main = () => {
                 return b[1] - a[1];
             });
             console.log(sortSources);
+            sendToDB(sortWords, sortSources);
       });
 }
 
-app.use(cors());
-app.get('/wordcount', function (req, res, next) {
-    res.send(JSON.stringify(sortable));
+app.get('/wordcount', function (req, res) {
+    res.send(JSON.stringify(sortWords));
 });
 
 const PORT = process.env.PORT || 5000;
