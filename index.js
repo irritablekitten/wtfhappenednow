@@ -80,7 +80,7 @@ class Counter extends Map {
   }
 
 //finds matches between titles by comparing one title in titleArray from the compareFunction loop to every title within the same array, while logging high-scoring results and ignoring exact matches
-const levenshteinFunction = (i) => {
+const damerauLevenshteinFunction = (i) => {
     let copy = titleArray;
     copy.map(function (obj) {
         let test = damerau(obj.title, i.title);
@@ -103,7 +103,7 @@ const compareFunction = () => {
     compareArray = [];
     let copy = titleArray;
     copy.map(function (i) {
-        levenshteinFunction(i);
+        damerauLevenshteinFunction(i);
     });
 }
 
@@ -140,6 +140,7 @@ const arrayFilter = (results) => {
     return results; 
 }
 
+//pushes results to firebase DB
 const sendToDB = (wordscounted, sourcescounted) => {
     let dateTime = moment().format('LLL');
     let postsRef = ref.child("results");
@@ -152,6 +153,7 @@ const sendToDB = (wordscounted, sourcescounted) => {
     console.log("Pushed to DB. ", dateTime);
 }
 
+//unused function to get and sort by newest from DB
 const getFromDB = () => {
     ref.orderByChild('date').on('child_added', function(snapshot) {
         console.log(snapshot.val());
@@ -159,17 +161,16 @@ const getFromDB = () => {
 };
 
 const main = () => {
-    //scheduled to pull sources and top articles from each source at the 58 minute mark every hour or 53 for pi3
-    let runScrape = schedule.scheduleJob('33 * * * *', function(){
+    //scheduled to grab sources and top articles from each source at the 58 and 59 minutes every hour or 52 and 53 for pi3
+    let getSources = schedule.scheduleJob('52 * * * *', function(){
         sourceArray = sourceMap();
     });
-
-    let getArticles = schedule.scheduleJob('34 * * * *', function(){
+    let getArticles = schedule.scheduleJob('53 * * * *', function(){
         titleArray = titleMap(sourceArray);
     });
 
     //scheduled to process data at 59 minutes of every hour or 54 for pi3
-    let everythingElse = schedule.scheduleJob('35 * * * *', function(){
+    let everythingElse = schedule.scheduleJob('54 * * * *', function(){
         compareFunction();
         let splitArray = splitFunction(compareArray);
         let results = arrayFixer(splitArray);
@@ -191,6 +192,5 @@ const main = () => {
         sendToDB(sortWords, sortSources);
     });
 }
-
 
 main();
