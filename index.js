@@ -3,7 +3,7 @@ const isomorphicFetch = require('isomorphic-fetch');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const admin = require("firebase-admin");
-const serviceAccount = require("./keys/creds.json");
+const serviceAccount = require("./keys/wtfhappenednow-server-firebase-adminsdk-q74se-ae52909ff9.json");
 const keys = require('./keys/keys');
 const token = keys.key;
 const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
@@ -14,10 +14,10 @@ let countSources = [];
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://some-server.firebaseio.com"
+  databaseURL: "https://wtfhappenednow-server.firebaseio.com"
 });
 var db = admin.database();
-var ref = db.ref("collection/document");
+var ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
 
 //gets all news sources by id
 let scrape = async () => {
