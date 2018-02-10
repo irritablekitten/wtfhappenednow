@@ -1,5 +1,22 @@
-The purpose of this program is to use the newsapi.org source API to grab and use each source ID to fetch top articles through the same API. Once the top articles are obtained, a Damerau-Levenshtein (https://www.npmjs.com/package/damerau-levenshtein) algorithm is used to find similar article titles, which for each title with a similarity rating of .40+, the article title is split and stored for finding the most common topics being reported.
+The purpose of this program is to use the newsapi.org source API to grab and use each source ID to fetch top articles through the same API. Once the top articles are obtained a Damerau-Levenshtein (https://www.npmjs.com/package/damerau-levenshtein) algorithm is used to find similar article titles, where titles are recorded with similarity rating of .40 or higher and those article titles are split into single words to be counted and filtered for most common news topics.
 
-The long-term goal is to present the most common words/topics in a live trend feed, where the most-found topics appear at the top with the largest font size and conversely, the least-repetitious words are toward the bottom in smaller font.
+To use this yourself in Node, you will need an newspi.org api key of your own as an environment variable (set up through keys/prod.js and a host like Heroku or AWS) or a keys/dev.js key file for local hosting with this structure:
 
-Following the outlined functionality, the plan is to use the same data to present links to articles from the source titles that end up as the count for trending news topics, as an interactive trend tracker combined with news sourcing.
+    module.exports = {
+        key: "paste-news-dot-org-key-here"
+    };
+
+And a Firebase DB connected with credentials (following the directions at https://firebase.google.com/docs/admin/setup) and changing the initialization in the code:
+
+    const serviceAccount = require("./keys/your-firebase-db-credentials.json");
+
+    admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://some-server.firebaseio.com"
+    });
+    var db = admin.database();
+    var ref = db.ref("somecollection/yourdocument");
+
+Or comment out the DB push function to simply use the data locally.
+
+Alternatively, the same initial data can be counted with no filter by skipping the Damerau-Levenshtein function for broader results.
