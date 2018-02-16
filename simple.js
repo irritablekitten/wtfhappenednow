@@ -13,11 +13,7 @@ let titleArray = complex.titleArray;
 let compareArray = [];
 let countSources = [];
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://wtfhappenednow-server.firebaseio.com"
-});
-var db = admin.database();
+let db = complex.db;
 
 
 //gets all news sources by id

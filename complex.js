@@ -195,6 +195,7 @@ const main = () => {
 }
 
 module.exports = { titleArray: titleArray,
-                    sourceArray: sourceArray };
+                    sourceArray: sourceArray,
+                db: db };
 
 main();
