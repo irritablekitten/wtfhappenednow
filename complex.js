@@ -17,7 +17,7 @@ admin.initializeApp({
   databaseURL: "https://wtfhappenednow-server.firebaseio.com"
 });
 var db = admin.database();
-var ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
+
 
 //gets all news sources by id
 let scrape = async () => {
@@ -141,7 +141,7 @@ const arrayFilter = (results) => {
 }
 
 //pushes results to firebase DB
-const sendToDB = (wordscounted, sourcescounted) => {
+const sendToDB = (wordscounted, sourcescounted, ref) => {
     let dateTime = moment().format('LLL');
     let postsRef = ref.child("results");
     postsRef.push({
@@ -155,23 +155,24 @@ const sendToDB = (wordscounted, sourcescounted) => {
 
 //unused function to get and sort by newest from DB
 const getFromDB = () => {
-    ref.orderByChild('date').on('child_added', function(snapshot) {
+    ref.orderByChild('date').limitToLast(1).on('child_added', function(snapshot) {
         console.log(snapshot.val());
     });
 };
 
 const main = () => {
-    //scheduled to grab sources and top articles from each source at the 58 and 59 minutes every hour or 52 and 53 for pi3
-    let getSources = schedule.scheduleJob('52 * * * *', function(){
+    //scheduled to grab sources and top articles from each source at the 58 and 59 minutes every hour or 51 and 52 for pi3 (it's slow)
+    let getSources = schedule.scheduleJob('51 * * * *', function(){
         sourceArray = sourceMap();
     });
-    let getArticles = schedule.scheduleJob('53 * * * *', function(){
+    let getArticles = schedule.scheduleJob('52 * * * *', function(){
         titleArray = titleMap(sourceArray);
     });
 
-    //scheduled to process data at 59 minutes of every hour or 54 for pi3
-    let everythingElse = schedule.scheduleJob('54 * * * *', function(){
+    //scheduled to process data at 59 minutes of every hour or 53 for pi3
+    let complexCompare = schedule.scheduleJob('53 * * * *', function(){
         compareFunction();
+        let ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
         let splitArray = splitFunction(compareArray);
         let results = arrayFixer(splitArray);
         let countArray = arrayFilter(results);     
@@ -188,9 +189,12 @@ const main = () => {
         sortSources.sort(function(a, b) {
             return b[1] - a[1];
         });
-
-        sendToDB(sortWords, sortSources);
+        
+        sendToDB(sortWords, sortSources, ref);
     });
 }
+
+module.exports = { titleArray: titleArray,
+                    sourceArray: sourceArray };
 
 main();

@@ -4,8 +4,8 @@
   "description": "Uses NewsApi sources to pull up top news articles and display most common words",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "sudo nodemon complex.js & sudo nodemon simple.js",
+    "start": "node simple.js"
   },
   "author": "Sam Defazio",
   "license": "ISC",

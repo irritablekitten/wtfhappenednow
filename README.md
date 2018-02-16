@@ -19,4 +19,4 @@ And a Firebase DB connected with credentials (following the directions at https:
 
 Or comment out the DB push function to simply use the data locally.
 
-Alternatively, the same initial data can be counted with no filter by skipping the Damerau-Levenshtein function for broader results.
+Alternatively, the same initial data can be counted with no filter by skipping the Damerau-Levenshtein function for broader results (filter and count titleArray and sourceArray directly).
