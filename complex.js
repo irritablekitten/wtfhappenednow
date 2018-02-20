@@ -6,7 +6,8 @@ const admin = require("firebase-admin");
 const serviceAccount = require("./keys/wtfhappenednow-server-firebase-adminsdk-q74se-ae52909ff9.json");
 const keys = require('./keys/keys');
 const token = keys.key;
-const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as'];
+const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as', 'with', 'it'];
+const regexFilter = /(^&#039\W|&#039$\W)/;
 let sourceArray = [];
 let titleArray = [];
 let compareArray = [];
@@ -113,20 +114,36 @@ const splitFunction = (splitThis) => {
     let newArray = [];
     let countArray = [];
     copy.map(function (obj) {
-        let post = obj.first.split(' ');
-        newArray.push(post);
-        countArray.push(obj.source);
+        if (obj !== undefined) {
+            let post = obj.first.split(' ');
+            newArray.push(post);
+            countArray.push(obj.source);
+        }
      });
      countSources = countArray;
      return newArray;
 }
+
+//splitter for the simple filter
+/*
+const splitSimple = (splitThis) => {
+    let newArray = []
+    for (let entry in splitThis) {
+        if (splitThis[entry] !== undefined) {
+            let newString = splitThis[entry].toString().split('');
+            newArray.push(newString);
+        }
+    }
+    return newArray;
+}
+*/
 
 //returns a new array with old arrays split apart
 const arrayFixer = (array) => {
     let newArray = [];
     for (let i in array) {
         for (let j in array[i]) {
-            if (array[i][j] !== undefined) {
+            if (array[i][j] !== undefined && regexFilter.test(array[i][j]) !== true) {
                 newArray.push(array[i][j].toString().toLowerCase());
             }                    
         }        
@@ -150,15 +167,7 @@ const sendToDB = (wordscounted, sourcescounted, ref) => {
         date: admin.database.ServerValue.TIMESTAMP,
         fulldate: dateTime
       });
-    console.log("Pushed to DB. ", dateTime);
 }
-
-//unused function to get and sort by newest from DB
-const getFromDB = () => {
-    ref.orderByChild('date').limitToLast(1).on('child_added', function(snapshot) {
-        console.log(snapshot.val());
-    });
-};
 
 const main = () => {
     //scheduled to grab sources and top articles from each source at the 58 and 59 minutes every hour or 51 and 52 for pi3 (it's slow)
@@ -191,11 +200,33 @@ const main = () => {
         });
         
         sendToDB(sortWords, sortSources, ref);
+        console.log("Complex sent to DB. ", moment().format('LLL'));
     });
-}
+    //simple filter WIP
+    /*
+    let simpleCompare = schedule.scheduleJob('01 * * * *', function(){
+        let ref = db.ref("/newsdata/zxl36W7TxudNhEsduy6a/");
+        let splitArray = splitSimple(titleArray);
+        let results = arrayFixer(splitArray);
+        let countArray = arrayFilter(results);     
+        let counter = new Counter(countArray);
+        delete counter.key;
+        let sortWords = Array.from(counter);
+        sortWords.sort(function(a, b) {
+            return b[1] - a[1];
+        });
 
-module.exports = { titleArray: titleArray,
-                    sourceArray: sourceArray,
-                db: db };
+        let printSources = new Counter(sourceArray);
+        delete printSources.key;
+        let sortSources = Array.from(printSources);
+        sortSources.sort(function(a, b) {
+            return b[1] - a[1];
+        });
+        
+        sendToDB(sortWords, sortSources, ref);
+        console.log("Simple sent to DB. ", moment().format('LLL'));
+    });
+    */
+}
 
 main();
