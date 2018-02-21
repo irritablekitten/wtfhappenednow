@@ -15,7 +15,7 @@ let countSources = [];
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://wtfhappenednow-server.firebaseio.com"
+  databaseURL: "https://some-server.firebaseio.com"
 });
 var db = admin.database();
 
