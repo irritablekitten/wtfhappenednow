@@ -1,4 +1,4 @@
-The purpose of this program is to use the newsapi.org source API to grab and use IDs to fetch top articles from each source. Once the top articles are obtained, a Damerau-Levenshtein (https://www.npmjs.com/package/damerau-levenshtein) algorithm is used to find similar article titles, where titles are recorded with similarity rating of .40 or higher and those article titles are split into single words to be counted and filtered for most common news topics.
+The purpose of this program is to use top articles pulled from NewsApi.org from 40 different sources reporting on US news. Once the top articles are obtained, a Damerau-Levenshtein (https://www.npmjs.com/package/damerau-levenshtein) algorithm is used to find similar article titles, where titles are recorded with similarity rating of .40 or higher and those article titles are split into single words to be counted and filtered for most common news topics.
 
 To use this yourself in Node, you will need an newspi.org api key of your own as an environment variable (set up through keys/prod.js and a host like Heroku or AWS) or a keys/dev.js key file for local hosting with this structure:
 
