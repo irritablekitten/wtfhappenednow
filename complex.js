@@ -3,12 +3,13 @@ const isomorphicFetch = require('isomorphic-fetch');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const admin = require("firebase-admin");
-const serviceAccount = require("./keys/wtfhappenednow-server-firebase-adminsdk-q74se-ae52909ff9.json");
+const serviceAccount = require("./keys/wtfhappenednow-server-firebase-adminsdk-q74se-84dcaedbe9.json");
 const keys = require('./keys/keys');
 const token = keys.key;
-const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as', 'with', 'it'];
+const filters = ['to', 'for', 'the', 'in', 'a', 'and', 'to', 'of', 'but', 'from', 'at', 'when', ',', '', '|', 'is', 'are', 'an', 'will', 'be', '-', '\\', 'by', 'on', 'as', 'with', 'it', 'you', 'your'];
 const regexFilter = /(^&#039\W|&#039$\W)/;
-let sourceArray = [];
+const sourceArray = ['abc-news', 'al-jazeera-english', 'bbc-news', 'associated-press', 'axios', 'bloomberg', 'business-insider', 'cbs-news','cnbc','cnn', 'crypto-coins-news', 'daily-mail', 'engadget', 'fortune', 'google-news', 'hacker-news', 'msnbc', 'national-geographic', 'nbc-news', 'new-scientist', 'newsweek', 'new-york-magazine', 'politico',  'recode', 'reuters', 'techcrunch', 'techradar', 'the-economist', 'the-guardian-uk', 'the-hill', 'the-huffington-post', 'the-new-york-times', 'the-next-web', 'the-verge', 'the-wall-street-journal', 'the-washington-post', 'time', 'usa-today', 'vice-news', 'wired'];
+
 let titleArray = [];
 let compareArray = [];
 let countSources = [];
@@ -20,20 +21,24 @@ admin.initializeApp({
 var db = admin.database();
 
 
-//gets all news sources by id
+//gets all news sources by id //depricated
+/*
 let scrape = async () => {
     let res = await fetch(
       `https://newsapi.org/v1/sources?language=en`);
     return await res.json();  
   }
+*/
 
 //obtains top articles per source id
-let addTitles = async (obj) => {
+let addTitles = async (id) => {
     let res = await fetch(
-        `https://newsapi.org/v2/top-headlines?sources=${obj}&apiKey=${token}`)
+        `https://newsapi.org/v2/top-headlines?sources=${id}&apiKey=${token}`)
     return await res.json(); 
 }
 
+//previously mapped out the sources and their ids for getting top articles //depricated
+/*
 const sourceMap = () => {
     let newArray = [];
     scrape().then((res) =>  {
@@ -45,15 +50,16 @@ const sourceMap = () => {
     }).catch(err => console.error(err))
     return newArray;
 }
+*/
 
-const titleMap = (titles) => {
+const titleMap = (ids) => {
     let newArray = [];
-    titles.map(function (obj) {
-        addTitles(obj.id).then((res) => {
+    for (let id in ids) {
+        addTitles(ids[id]).then((res) => {
             if (res.articles !== undefined) {
                 res.articles.map(function (objTwo) {
                     let article = {
-                        id: obj.id,
+                        id: ids[id],
                         title: objTwo.title,
                         url: objTwo.url
                     };
@@ -61,7 +67,7 @@ const titleMap = (titles) => {
                 }); 
             } 
         }).catch(err => console.error(err)) 
-    });
+    }
     return newArray;
 }
 
@@ -124,20 +130,6 @@ const splitFunction = (splitThis) => {
      return newArray;
 }
 
-//splitter for the simple filter
-/*
-const splitSimple = (splitThis) => {
-    let newArray = []
-    for (let entry in splitThis) {
-        if (splitThis[entry] !== undefined) {
-            let newString = splitThis[entry].toString().split('');
-            newArray.push(newString);
-        }
-    }
-    return newArray;
-}
-*/
-
 //returns a new array with old arrays split apart
 const arrayFixer = (array) => {
     let newArray = [];
@@ -170,10 +162,6 @@ const sendToDB = (wordscounted, sourcescounted, ref) => {
 }
 
 const main = () => {
-    //scheduled to grab sources and top articles from each source at the 58 and 59 minutes every hour or 51 and 52 for pi3 (it's slow)
-    let getSources = schedule.scheduleJob('51 * * * *', function(){
-        sourceArray = sourceMap();
-    });
     let getArticles = schedule.scheduleJob('52 * * * *', function(){
         titleArray = titleMap(sourceArray);
     });
@@ -202,31 +190,7 @@ const main = () => {
         sendToDB(sortWords, sortSources, ref);
         console.log("Complex sent to DB. ", moment().format('LLL'));
     });
-    //simple filter WIP
-    /*
-    let simpleCompare = schedule.scheduleJob('01 * * * *', function(){
-        let ref = db.ref("/newsdata/zxl36W7TxudNhEsduy6a/");
-        let splitArray = splitSimple(titleArray);
-        let results = arrayFixer(splitArray);
-        let countArray = arrayFilter(results);     
-        let counter = new Counter(countArray);
-        delete counter.key;
-        let sortWords = Array.from(counter);
-        sortWords.sort(function(a, b) {
-            return b[1] - a[1];
-        });
-
-        let printSources = new Counter(sourceArray);
-        delete printSources.key;
-        let sortSources = Array.from(printSources);
-        sortSources.sort(function(a, b) {
-            return b[1] - a[1];
-        });
-        
-        sendToDB(sortWords, sortSources, ref);
-        console.log("Simple sent to DB. ", moment().format('LLL'));
-    });
-    */
+   
 }
 
 main();
