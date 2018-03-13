@@ -162,12 +162,13 @@ const sendToDB = (wordscounted, sourcescounted, ref) => {
 }
 
 const main = () => {
-    let getArticles = schedule.scheduleJob('52 * * * *', function(){
+    //scheduled to get data at 58 minutes of every hour or 55 for pi3
+    let getArticles = schedule.scheduleJob('55 * * * *', function(){
         titleArray = titleMap(sourceArray);
     });
 
-    //scheduled to process data at 59 minutes of every hour or 53 for pi3
-    let complexCompare = schedule.scheduleJob('53 * * * *', function(){
+    //scheduled to process data at 59 minutes of every hour or 56 for pi3
+    let complexCompare = schedule.scheduleJob('56 * * * *', function(){
         compareFunction();
         let ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
         let splitArray = splitFunction(compareArray);
