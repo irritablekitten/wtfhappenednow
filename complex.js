@@ -153,12 +153,14 @@ const arrayFilter = (results) => {
 const sendToDB = (wordscounted, sourcescounted, ref) => {
     let dateTime = moment().format('LLL');
     let postsRef = ref.child("results");
-    postsRef.push({
-        wordcount: wordscounted,
-        sourcecount: sourcescounted,
-        date: admin.database.ServerValue.TIMESTAMP,
-        fulldate: dateTime
-      });
+    if (wordscounted !== undefined && wordscounted !== '') {
+        postsRef.push({
+            wordcount: wordscounted,
+            sourcecount: sourcescounted,
+            date: admin.database.ServerValue.TIMESTAMP,
+            fulldate: dateTime
+          });
+    }
 }
 
 const main = () => {
