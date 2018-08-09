@@ -20,37 +20,12 @@ admin.initializeApp({
 });
 var db = admin.database();
 
-
-//gets all news sources by id //depricated
-/*
-let scrape = async () => {
-    let res = await fetch(
-      `https://newsapi.org/v1/sources?language=en`);
-    return await res.json();  
-  }
-*/
-
 //obtains top articles per source id
 let addTitles = async (id) => {
     let res = await fetch(
         `https://newsapi.org/v2/top-headlines?sources=${id}&apiKey=${token}`)
     return await res.json(); 
 }
-
-//previously mapped out the sources and their ids for getting top articles //depricated
-/*
-const sourceMap = () => {
-    let newArray = [];
-    scrape().then((res) =>  {
-        if (res.sources !== undefined) {
-            res.sources.map(function (obj) {             
-                newArray.push(obj);              
-            });    
-        }
-    }).catch(err => console.error(err))
-    return newArray;
-}
-*/
 
 const titleMap = (ids) => {
     let newArray = [];
@@ -152,12 +127,12 @@ const arrayFilter = (results) => {
 //pushes results to firebase DB
 const sendToDB = (wordscounted, sourcescounted, ref) => {
     let dateTime = moment().format('LLL');
-    let postsRef = ref.child("results");
-    if (wordscounted !== undefined && wordscounted !== '') {
-        postsRef.push({
+    let resultRef = ref.child('results');
+    if (wordscounted !== undefined && wordscounted !== '' && wordscounted !==null) {
+        resultRef.push({
             wordcount: wordscounted,
             sourcecount: sourcescounted,
-            date: admin.database.ServerValue.TIMESTAMP,
+            timestamp: admin.database.ServerValue.TIMESTAMP,
             fulldate: dateTime
           });
     }
@@ -172,7 +147,8 @@ const main = () => {
     //scheduled to process data at 59 minutes of every hour or 56 for pi3
     let complexCompare = schedule.scheduleJob('56 * * * *', function(){
         compareFunction();
-        let ref = db.ref("/newsdata/1d3V3Yd3CRen8aqYTrXx/");
+        let monthYear = moment().format('YYYY MMMM');
+        let ref = db.ref(`${monthYear}`);
         let splitArray = splitFunction(compareArray);
         let results = arrayFixer(splitArray);
         let countArray = arrayFilter(results);     
@@ -191,7 +167,6 @@ const main = () => {
         });
         
         sendToDB(sortWords, sortSources, ref);
-        console.log("Complex sent to DB. ", moment().format('LLL'));
     });
    
 }
